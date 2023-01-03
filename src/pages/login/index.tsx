@@ -1,78 +1,93 @@
 import React from "react";
-import { Navbar } from "../../common/Navbar";
-import { Box, Button, Container, Grid, Paper } from "@mui/material";
-import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
-import { Stack } from "@mui/system";
+import {
+  Box,
+  Button,
+  Container,
+  Grid,
+  Paper,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useNotification } from "../../context/notification.context";
+import { LoginValidate } from "../../utils/validateForm";
+import { useFormik } from "formik";
 
 type LoginType = {
   username: string;
   password: string;
 };
-
-export const LoginPage = () => {
-  const [loginData, setLoginData] = React.useState<LoginType>({
-    username: "",
-    password: "",
+const LoginPage: React.FC<{}> = () => {
+  const { getSuccess } = useNotification();
+  const formik = useFormik<LoginType>({
+    initialValues: {
+      username: "",
+      password: "",
+    },
+    validationSchema: LoginValidate,
+    onSubmit: (values: LoginType) => {
+      console.log(values.password);
+      getSuccess(JSON.stringify(values));
+    },
   });
 
-  const dataLogin = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLoginData({ ...loginData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    console.log(loginData);
-  };
   return (
-    <div>
-      <Container maxWidth="sm">
-        <Grid
-          container
-          direction="column"
-          alignItems="center"
-          justifyContent="center"
-          sx={{ minHeight: "100vh" }}
-        >
-          <Grid item>
-            <Paper sx={{ padding: "1.2em", borderRadius: "0.5em" }}>
-              <Typography sx={{ mt: 1, mb: 1 }} variant="h4">
-                Iniciar Sesion
-              </Typography>
-              <Box component="form" onSubmit={handleSubmit}>
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  label="Email"
-                  sx={{ mt: 2, mb: 1.5 }}
-                  required
-                  type="text"
-                  name="username"
-                  onChange={dataLogin}
-                ></TextField>
-                <TextField
-                  name="password"
-                  onChange={dataLogin}
-                  fullWidth
-                  margin="normal"
-                  label="Password"
-                  sx={{ mt: 2, mb: 1.5 }}
-                  required
-                  type="password"
-                ></TextField>
-                <Button
-                  fullWidth
-                  type="submit"
-                  variant="contained"
-                  sx={{ mt: 1.5, mb: 3 }}
-                >
-                  Iniciar Sesion
-                </Button>
-              </Box>
-            </Paper>
-          </Grid>
+    <Container maxWidth="sm">
+      <Grid
+        container
+        direction="column"
+        alignItems="center"
+        justifyContent="center"
+        sx={{ minHeight: "100vh" }}
+      >
+        <Grid item>
+          <Paper sx={{ padding: "1.2em", borderRadius: "0.5em" }}>
+            <Typography sx={{ mt: 1, mb: 1 }} variant="h4">
+              Iniciar sesion
+            </Typography>
+            <Box component="form" onSubmit={formik.handleSubmit}>
+              <TextField
+                name="username"
+                margin="normal"
+                type="text"
+                fullWidth
+                label="Email"
+                sx={{ mt: 2, mb: 1.5 }}
+                value={formik.values.username}
+                onChange={formik.handleChange}
+                error={
+                  formik.touched.username && Boolean(formik.errors.username)
+                }
+                helperText={formik.touched.username && formik.errors.username}
+              />
+              <TextField
+                name="password"
+                margin="normal"
+                type="password"
+                fullWidth
+                label="Password"
+                sx={{ mt: 1.5, mb: 1.5 }}
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                error={
+                  formik.touched.password && Boolean(formik.errors.password)
+                }
+                helperText={formik.touched.password && formik.errors.password}
+              />
+
+              <Button
+                fullWidth
+                type="submit"
+                variant="contained"
+                sx={{ mt: 1.5, mb: 3 }}
+              >
+                Iniciar sesion
+              </Button>
+            </Box>
+          </Paper>
         </Grid>
-      </Container>
-    </div>
+      </Grid>
+    </Container>
   );
 };
+
+export default LoginPage;
